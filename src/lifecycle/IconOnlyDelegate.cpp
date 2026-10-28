@@ -26,9 +26,9 @@ void IconOnlyDelegate::paint(QPainter* painter, const QStyleOptionViewItem& opti
     auto windowCount = qvariant_cast<WindowGroup>(index.data(Qt::UserRole)).windows.size();
     if (windowCount > 1) {
         auto text = QString::number(windowCount);
-        const auto badgeTextPadding = 8 * (text.size() - 1);
-        constexpr auto badgeRadius = 12;
-        auto badgeCenter = option.rect.topRight() + QPoint(-(badgeRadius + 3), badgeRadius + 3);
+        const auto badgeTextPadding = 16 * (text.size() - 1);
+        constexpr auto badgeRadius = 24;
+        auto badgeCenter = option.rect.topRight() + QPoint(-(badgeRadius + 6), badgeRadius + 6);
         auto badgeRect = QRect(badgeCenter + QPoint(-badgeRadius - badgeTextPadding, -badgeRadius), QSize(2 * badgeRadius + badgeTextPadding, 2 * badgeRadius));
         painter->setPen(Qt::NoPen);
         painter->setBrush(colors.badgeBg);
@@ -43,5 +43,5 @@ void IconOnlyDelegate::paint(QPainter* painter, const QStyleOptionViewItem& opti
 QSize IconOnlyDelegate::sizeHint(const QStyleOptionViewItem& option, const QModelIndex& index) const {
     Q_UNUSED(option);
     Q_UNUSED(index);
-    return QSize(80, 80);
+    return QSize(160, 160);
 }
