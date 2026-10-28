@@ -17,10 +17,10 @@ public:
     explicit IconOnlyDelegate(QObject* parent = nullptr,
                               QColor selectedColor = QColor(80, 80, 80, 200),
                               QColor hoverColor = QColor(50, 50, 50, 100),
-                              int radius = 8)
+                              int radius = 16)
         : QStyledItemDelegate(parent), m_selectedColor(selectedColor), m_hoverColor(hoverColor),
           m_cornerRadius(radius), m_badgeFont(QStringLiteral("Microsoft YaHei")) {
-        m_badgeFont.setPointSizeF(12.8);
+        m_badgeFont.setPointSizeF(25.6);
         m_badgeFont.setBold(true);
     }
 
