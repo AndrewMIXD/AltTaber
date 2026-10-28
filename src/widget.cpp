@@ -48,8 +48,8 @@ Widget::Widget(WindowManager* wm, QWidget* parent)
     m_listView->setWrapping(false);
     m_listView->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     m_listView->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    m_listView->setIconSize({64, 64});
-    m_listView->setGridSize({80, 80});
+    m_listView->setIconSize({128, 128});
+    m_listView->setGridSize({160, 160});
     m_listView->setFixedHeight(m_listView->gridSize().height());
     m_listView->setUniformItemSizes(true);
     m_listView->setStyleSheet(R"(
