@@ -78,25 +78,25 @@ QRect OverlayController::calculateGeometry(QScreen* screen) {
     if (!screen) return {};
 
     auto screenGeo = screen->geometry();
-    int maxWidth = screenGeo.width() - 24 - 24;
+    int maxWidth = screenGeo.width() - 48 - 48;
 
-    int totalNeeded = m_model->groupCount() * 80;
-    int iconSize = 64;
-    int gridWidth = 80;
+    int totalNeeded = m_model->groupCount() * 160;
+    int iconSize = 128;
+    int gridWidth = 160;
     int minIcon = cfg().getMinIconSize();
 
     if (totalNeeded > maxWidth) {
         gridWidth = maxWidth / m_model->groupCount();
-        iconSize = qMax(minIcon, gridWidth - 16);
+        iconSize = qMax(minIcon, gridWidth - 32);
         if (iconSize > gridWidth)
             iconSize = gridWidth;
     }
 
-    m_view.applyIconLayout(iconSize, gridWidth, gridWidth > 80 ? 80 : gridWidth);
+    m_view.applyIconLayout(iconSize, gridWidth, gridWidth > 160 ? 160 : gridWidth);
 
     int listWidth = gridWidth * m_model->groupCount();
-    auto listViewRect = QRect(0, 0, listWidth, qMax(gridWidth, 80));
-    auto widgetRect = listViewRect.marginsAdded({24, 24, 24, 24});
+    auto listViewRect = QRect(0, 0, listWidth, qMax(gridWidth, 160));
+    auto widgetRect = listViewRect.marginsAdded({48, 48, 48, 48});
     widgetRect.moveCenter(screenGeo.center());
     listViewRect.moveCenter(widgetRect.center());
 
