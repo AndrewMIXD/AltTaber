@@ -83,7 +83,7 @@ private:
     QListView* m_listView = nullptr;
     WindowGroupModel* m_model = nullptr;
     WindowManager* m_windowManager = nullptr;
-    const QMargins m_listWidgetMargin{24, 24, 24, 24};
+    const QMargins m_listWidgetMargin{48, 48, 48, 48};
 
     OverlayController* m_overlayCtrl;
     SelectionController* m_selectCtrl;
