@@ -676,6 +676,25 @@ namespace Util {
                                  const AppIdentity& identity) {
         static QHash<QString, IconResult> s_cache;
 
+        // Custom per-app icon override, set in config.json:
+        //   "IconOverrides": { "zen.exe": "D:/AltTaber/zen-orange.png" }
+        {
+            const auto overrides = cfg().get("IconOverrides").toMap();
+            for (auto it = overrides.cbegin(); it != overrides.cend(); ++it) {
+                if (it.key().compare(processName, Qt::CaseInsensitive) != 0)
+                    continue;
+                QIcon customIcon(it.value().toString());
+                QPixmap probe = customIcon.pixmap(256, 256);
+                if (!probe.isNull()) {
+                    IconResult custom;
+                    custom.icon = customIcon;
+                    custom.sourceSize = probe.size();
+                    custom.source = IconSource::Provider;
+                    return custom;
+                }
+            }
+        }
+
         QString cacheKey;
         if (windowKind == WindowKind::Pwa && !appUserModelId.isEmpty())
             cacheKey = QStringLiteral("PWA:") + appUserModelId;
