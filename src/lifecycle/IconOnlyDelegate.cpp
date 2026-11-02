@@ -23,9 +23,13 @@ void IconOnlyDelegate::paint(QPainter* painter, const QStyleOptionViewItem& opti
         icon.paint(painter, iconRect);
     }
 
-    auto windowCount = qvariant_cast<WindowGroup>(index.data(Qt::UserRole)).windows.size();
-    if (windowCount > 1) {
-        auto text = QString::number(windowCount);
+    const auto groupData = qvariant_cast<WindowGroup>(index.data(Qt::UserRole));
+    // Split windows (UngroupWindows) show their number; grouped apps show their window count
+    const int badgeNumber = groupData.splitIndex > 0
+        ? groupData.splitIndex
+        : (groupData.windows.size() > 1 ? static_cast<int>(groupData.windows.size()) : 0);
+    if (badgeNumber > 0) {
+        auto text = QString::number(badgeNumber);
         const auto badgeTextPadding = 16 * (text.size() - 1);
         constexpr auto badgeRadius = 24;
         auto badgeCenter = option.rect.topRight() + QPoint(-(badgeRadius + 6), badgeRadius + 6);
