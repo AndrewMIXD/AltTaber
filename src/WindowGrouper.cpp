@@ -62,6 +62,7 @@ namespace WindowGrouper {
 
         bool pwaEnabled = cfg().getPwaEnabled();
         bool separateGroups = pwaEnabled && cfg().getPwaMode() == PwaMode::SeparateGroups;
+        bool ungroup = cfg().get("UngroupWindows", false).toBool();
 
         for (const auto& desc : windows) {
             if (desc.hwnd == selfHwnd) continue;
@@ -70,6 +71,9 @@ namespace WindowGrouper {
             QString groupKey = desc.identity.groupKey();
             if (separateGroups && desc.windowKind == WindowKind::Pwa)
                 groupKey = desc.appUserModelId;
+            QString baseKey = groupKey;
+            if (ungroup)
+                groupKey += QStringLiteral("#") + QString::number(reinterpret_cast<quintptr>(desc.hwnd));
 
             WindowInfo winInfo{desc.title, desc.className, desc.appUserModelId,
                                desc.hwnd, desc.windowKind, desc.pwaDisplayName,
@@ -82,6 +86,7 @@ namespace WindowGrouper {
                 group.exePath = desc.processPath;
                 group.icon = Util::resolveWindowIcon(desc).icon;
                 group.displayName = Util::resolveDisplayName(desc);
+                group.baseKey = baseKey;
 
                 group.addWindow(winInfo);
                 populateJumpTokens(group);
@@ -100,6 +105,16 @@ namespace WindowGrouper {
                     latestB = qMax(latestB, history->lastActivationTime(win.identity));
                 return latestA > latestB;
             });
+        }
+
+        // UngroupWindows: number split windows of the same app 1, 2, 3... in display order
+        if (ungroup) {
+            QMap<QString, int> totals, seen;
+            for (const auto& g : result)
+                totals[g.baseKey]++;
+            for (auto& g : result)
+                if (totals.value(g.baseKey) > 1)
+                    g.splitIndex = ++seen[g.baseKey];
         }
 
         return result;
