@@ -107,14 +107,38 @@ namespace WindowGrouper {
             });
         }
 
-        // UngroupWindows: number split windows of the same app 1, 2, 3... in display order
+        // UngroupWindows: number split windows of the same app 1, 2, 3... by creation order.
+        // AltTaber remembers the order it first saw each window (kept until the window closes),
+        // so a window keeps its number no matter which one is selected or used last.
         if (ungroup) {
-            QMap<QString, int> totals, seen;
+            static QHash<quintptr, quint64> firstSeen;
+            static quint64 nextSeq = 0;
+
+            // Forget windows that no longer exist
+            for (auto it = firstSeen.begin(); it != firstSeen.end();) {
+                if (IsWindow(reinterpret_cast<HWND>(it.key()))) ++it;
+                else it = firstSeen.erase(it);
+            }
+
+            // New windows get the next number; when several appear at once,
+            // the least recently used one is treated as the oldest
+            for (auto it = result.crbegin(); it != result.crend(); ++it) {
+                const auto key = reinterpret_cast<quintptr>(it->windows.first().hwnd);
+                if (!firstSeen.contains(key))
+                    firstSeen.insert(key, nextSeq++);
+            }
+
+            QMap<QString, QList<quint64>> seqsByApp;
             for (const auto& g : result)
-                totals[g.baseKey]++;
-            for (auto& g : result)
-                if (totals.value(g.baseKey) > 1)
-                    g.splitIndex = ++seen[g.baseKey];
+                seqsByApp[g.baseKey].append(firstSeen.value(reinterpret_cast<quintptr>(g.windows.first().hwnd)));
+            for (auto& seqs : seqsByApp)
+                std::sort(seqs.begin(), seqs.end());
+
+            for (auto& g : result) {
+                const auto& seqs = seqsByApp[g.baseKey];
+                if (seqs.size() > 1)
+                    g.splitIndex = static_cast<int>(seqs.indexOf(firstSeen.value(reinterpret_cast<quintptr>(g.windows.first().hwnd)))) + 1;
+            }
         }
 
         return result;
