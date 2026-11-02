@@ -84,6 +84,8 @@ struct WindowGroup {
     QList<WindowInfo> windows;
 
     QString displayName;
+    QString baseKey;      // app key before splitting (UngroupWindows)
+    int splitIndex = 0;   // 1, 2, 3... when an app's windows are split; 0 = not split
 
     QSet<QChar> fileDescriptionTokens;
     QSet<QChar> pwaNameTokens;
