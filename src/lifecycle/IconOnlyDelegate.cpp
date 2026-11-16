@@ -3,6 +3,7 @@
 #include "lifecycle/IconOnlyDelegate.h"
 #include "WindowTypes.h"
 #include "core/ThemeManager.h"
+#include "core/ConfigManager.h"
 
 void IconOnlyDelegate::paint(QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index) const {
     const auto& colors = ThemeManager::current();
@@ -20,7 +21,23 @@ void IconOnlyDelegate::paint(QPainter* painter, const QStyleOptionViewItem& opti
     if (!icon.isNull()) {
         QRect iconRect{{}, option.decorationSize};
         iconRect.moveCenter(option.rect.center());
+
+        // Dim the icon when every window behind it is minimized
+        // (opacity from config.json "MinimizedIconOpacity", default 0.7)
+        const auto dimData = qvariant_cast<WindowGroup>(index.data(Qt::UserRole));
+        bool allMinimized = !dimData.windows.isEmpty();
+        for (const auto& w : dimData.windows) {
+            if (!IsIconic(w.hwnd)) {
+                allMinimized = false;
+                break;
+            }
+        }
+
+        painter->save();
+        if (allMinimized)
+            painter->setOpacity(qBound(0.0, cfg().get("MinimizedIconOpacity", 0.7).toDouble(), 1.0));
         icon.paint(painter, iconRect);
+        painter->restore();
     }
 
     const auto groupData = qvariant_cast<WindowGroup>(index.data(Qt::UserRole));
